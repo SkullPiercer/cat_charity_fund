@@ -5,7 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.schemas.projects import CharityProjectDB, CharityProjectCreate, CharityProjectUpdate
 from app.crud.projects import projects_crud
-from app.api.validators import check_project_exists, check_name_duplicate, check_project_before_delete
+from app.api.validators import (
+    check_project_exists,
+    check_name_duplicate,
+    check_project_before_delete,
+    check_project_full_amount
+)
 
 router = APIRouter()
 
@@ -31,15 +36,18 @@ async def partially_update_project(
         obj_in: CharityProjectUpdate,
         session: AsyncSession = Depends(get_async_session),
 ):
-    meeting_room = await check_project_exists(
+    project = await check_project_exists(
         project_id, session
     )
 
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
 
+    if obj_in.full_amount is not None:
+        await check_project_full_amount(project, obj_in.full_amount)
+
     meeting_room = await projects_crud.update(
-        meeting_room, obj_in, session
+        project, obj_in, session
     )
     return meeting_room
 

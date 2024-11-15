@@ -1,11 +1,13 @@
+from typing import Optional
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 
 
 class CharityProjectUpdate(BaseModel):
-    name: str
-    description: str
+    name: Optional[str]
+    description: Optional[str]
     full_amount: int = Field(..., gt=0)
 
 
