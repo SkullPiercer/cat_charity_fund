@@ -17,3 +17,14 @@ async def check_project_exists(
             detail='Переговорка не найдена!'
         )
     return meeting_room
+
+async def check_name_duplicate(
+        room_name: str,
+        session: AsyncSession,
+) -> None:
+    room_id = await projects_crud.get_project_id_by_name(room_name, session)
+    if room_id is not None:
+        raise HTTPException(
+            status_code=422,
+            detail='Проект с таким именем уже существует!',
+        )
