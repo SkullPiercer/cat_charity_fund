@@ -5,18 +5,18 @@ from app.crud.projects import projects_crud
 from app.models import Project
 
 async def check_project_exists(
-        meeting_room_id: int,
+        project_id: int,
         session: AsyncSession,
 ) -> Project:
-    meeting_room = await projects_crud.get(
-        meeting_room_id, session
+    project = await projects_crud.get(
+        project_id, session
     )
-    if meeting_room is None:
+    if project is None:
         raise HTTPException(
             status_code=404,
             detail='Переговорка не найдена!'
         )
-    return meeting_room
+    return project
 
 async def check_name_duplicate(
         room_name: str,
@@ -28,3 +28,15 @@ async def check_name_duplicate(
             status_code=422,
             detail='Проект с таким именем уже существует!',
         )
+
+async def check_project_before_delete(
+        project_id: int,
+        session: AsyncSession,
+) -> Project:
+    project = await check_project_exists(project_id, session)
+    if project.invested_amount != 0:
+        raise HTTPException(
+            status_code=422,
+            detail='В проект уже внесены средства!',
+        )
+    return project

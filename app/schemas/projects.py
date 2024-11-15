@@ -8,8 +8,6 @@ class CharityProjectUpdate(BaseModel):
     description: str
     full_amount: int = Field(..., gt=0)
 
-    # @validator('full_amount')
-    # def validate_amount(self):
 
 class CharityProjectCreate(BaseModel):
     name: str

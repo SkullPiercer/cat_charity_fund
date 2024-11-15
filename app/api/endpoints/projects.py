@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.schemas.projects import CharityProjectDB, CharityProjectCreate, CharityProjectUpdate
 from app.crud.projects import projects_crud
-from app.api.validators import check_project_exists, check_name_duplicate
+from app.api.validators import check_project_exists, check_name_duplicate, check_project_before_delete
 
 router = APIRouter()
 
@@ -53,3 +53,17 @@ async def get_all_projects(
 ):
     all_projects = await projects_crud.get_multi(session)
     return all_projects
+
+@router.delete(
+    '/{project_id}',
+    response_model=CharityProjectDB,
+    response_model_exclude_none=True,
+)
+async def remove_project(
+        project_id: int,
+        session: AsyncSession = Depends(get_async_session),
+):
+    """Только для суперюзеров."""
+    project = await check_project_before_delete(project_id, session)
+    project = await projects_crud.remove(project, session)
+    return project
