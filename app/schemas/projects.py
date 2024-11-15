@@ -1,11 +1,15 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class CharityProjectUpdate(BaseModel):
     name: str
     description: str
+    full_amount: int = Field(..., gt=0)
+
+    # @validator('full_amount')
+    # def validate_amount(self):
 
 class CharityProjectCreate(BaseModel):
     name: str
