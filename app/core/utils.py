@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import Donation, Project
+from app.models import Donation, CharityProject
 from datetime import datetime
 from sqlalchemy import select
 from app.core.db import get_async_session
@@ -10,7 +10,7 @@ async def invest_funds(
         session: AsyncSession = Depends(get_async_session)
 ) -> None:
     projects = await session.execute(
-        select(Project).where(Project.fully_invested == False).order_by(Project.create_date)
+        select(CharityProject).where(CharityProject.fully_invested == False).order_by(CharityProject.create_date)
     )
     donations = await session.execute(
         select(Donation).where(Donation.fully_invested == False).order_by(Donation.create_date)

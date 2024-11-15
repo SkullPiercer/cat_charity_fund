@@ -14,11 +14,11 @@ class CRUDDonations(CRUDBase):
             session: AsyncSession,
             user: User
     ) -> list[Donation]:
-        user_reservations = await session.execute(
+        user_donations = await session.execute(
             select(Donation).where(
                 Donation.user_id == user.id
             )
         )
-        return user_reservations.scalars().all()
+        return user_donations.scalars().all()
 
 donation_crud = CRUDDonations(Donation)

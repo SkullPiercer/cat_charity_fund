@@ -5,7 +5,7 @@ from app.core.db import Base
 
 
 class Donation(Base):
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id', name='fk_reservation_user_id_user'))
     comment = Column(Text)
     full_amount = Column(Integer)
     invested_amount = Column(Integer, default=0)

@@ -2,13 +2,13 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.projects import projects_crud
-from app.models import Project
+from app.models import CharityProject
 
 
 async def check_project_exists(
         project_id: int,
         session: AsyncSession,
-) -> Project:
+) -> CharityProject:
     project = await projects_crud.get(
         project_id, session
     )
@@ -35,7 +35,7 @@ async def check_name_duplicate(
 async def check_project_before_delete(
         project_id: int,
         session: AsyncSession,
-) -> Project:
+) -> CharityProject:
     project = await check_project_exists(project_id, session)
     if project.invested_amount != 0:
         raise HTTPException(
@@ -46,7 +46,7 @@ async def check_project_before_delete(
 
 
 async def check_project_full_amount(
-        project: Project,
+        project: CharityProject,
         obj_full_amount: int
 ) -> None:
     if obj_full_amount <= project.invested_amount:

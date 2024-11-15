@@ -52,10 +52,10 @@ async def partially_update_project(
     if obj_in.full_amount is not None:
         await check_project_full_amount(project, obj_in.full_amount)
 
-    meeting_room = await projects_crud.update(
+    project = await projects_crud.update(
         project, obj_in, session
     )
-    return meeting_room
+    return project
 
 @router.get(
     '/',

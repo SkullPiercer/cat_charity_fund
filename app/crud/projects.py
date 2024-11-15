@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
-from app.models import Project
+from app.models import CharityProject
 
 
 class CRUDProjects(CRUDBase):
@@ -14,11 +14,11 @@ class CRUDProjects(CRUDBase):
             session: AsyncSession
     ) -> Optional[int]:
         db_project_id = await session.execute(
-            select(Project.id).where(
-                Project.name == project_name
+            select(CharityProject.id).where(
+                CharityProject.name == project_name
             )
         )
         return db_project_id.scalars().first()
 
 
-projects_crud = CRUDProjects(Project)
+projects_crud = CRUDProjects(CharityProject)
