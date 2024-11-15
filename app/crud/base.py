@@ -26,8 +26,16 @@ class CRUDBase:
 
     async def get_multi(
             self,
-            session: AsyncSession
+            session: AsyncSession,
+            user: Optional[User] = None
     ):
+        if user is not None:
+            db_objs = await session.execute(
+                select(self.model).where(
+                    self.model.user_id == user.id
+                )
+            )
+            return db_objs.scalars().all()
         db_objs = await session.execute(select(self.model))
         return db_objs.scalars().all()
 
