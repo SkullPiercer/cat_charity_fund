@@ -42,3 +42,14 @@ async def partially_update_project(
         meeting_room, obj_in, session
     )
     return meeting_room
+
+@router.get(
+    '/',
+    response_model=list[CharityProjectDB],
+    response_model_exclude_none=True,
+)
+async def get_all_projects(
+    session: AsyncSession = Depends(get_async_session)
+):
+    all_projects = await projects_crud.get_multi(session)
+    return all_projects
