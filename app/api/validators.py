@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.projects import projects_crud
 from app.models import Project
 
+
 async def check_project_exists(
         project_id: int,
         session: AsyncSession,
@@ -18,16 +19,18 @@ async def check_project_exists(
         )
     return project
 
+
 async def check_name_duplicate(
-        room_name: str,
+        project_name: str,
         session: AsyncSession,
 ) -> None:
-    room_id = await projects_crud.get_project_id_by_name(room_name, session)
+    room_id = await projects_crud.get_project_id_by_name(project_name, session)
     if room_id is not None:
         raise HTTPException(
             status_code=422,
             detail='Проект с таким именем уже существует!',
         )
+
 
 async def check_project_before_delete(
         project_id: int,
@@ -40,6 +43,7 @@ async def check_project_before_delete(
             detail='В проект уже внесены средства!',
         )
     return project
+
 
 async def check_project_full_amount(
         project: Project,

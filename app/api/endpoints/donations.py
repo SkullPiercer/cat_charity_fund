@@ -7,6 +7,7 @@ from app.core.db import get_async_session
 from app.schemas.donation import DonationDB, DonationCreate
 from app.crud.donation import donation_crud
 from app.core.user import current_user
+from app.core.utils import invest_funds
 
 router = APIRouter()
 
@@ -14,6 +15,7 @@ router = APIRouter()
     '/',
     response_model=DonationDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(invest_funds), Depends(current_user)]
 )
 async def create_new_project(
         donation: DonationCreate,
@@ -31,7 +33,10 @@ async def get_all_projects(
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_user)
 ):
-    all_projects = await donation_crud.get_by_user(
-        session=session, user=user
-    )
+    if user.role != 'admin':
+        all_projects = await donation_crud.get_by_user(
+            session=session, user=user
+        )
+    else:
+        all_projects = await donation_crud.get_multi(session)
     return all_projects

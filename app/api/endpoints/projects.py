@@ -11,6 +11,8 @@ from app.api.validators import (
     check_project_before_delete,
     check_project_full_amount
 )
+from app.core.utils import invest_funds
+from app.core.user import current_superuser
 
 router = APIRouter()
 
@@ -18,11 +20,14 @@ router = APIRouter()
     '/',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)]
 )
 async def create_new_project(
         project: CharityProjectCreate,
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        _: None = Depends(invest_funds)
 ):
+    await check_name_duplicate(project.name, session)
     new_project = await projects_crud.create(project, session)
     return new_project
 
@@ -30,6 +35,7 @@ async def create_new_project(
     '/{project_id}',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)]
 )
 async def partially_update_project(
         project_id: int,
@@ -66,6 +72,7 @@ async def get_all_projects(
     '/{project_id}',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)]
 )
 async def remove_project(
         project_id: int,
