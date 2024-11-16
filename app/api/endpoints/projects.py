@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -45,6 +45,12 @@ async def partially_update_project(
     project = await check_project_exists(
         project_id, session
     )
+
+    if project.fully_invested:
+        raise HTTPException(
+            status_code=400,
+            detail='Нельзя обновлять полностью проинвестированный проект!',
+        )
 
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
