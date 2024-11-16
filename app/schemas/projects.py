@@ -12,12 +12,12 @@ class CharityProjectUpdate(BaseModel):
 
 
 class CharityProjectCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
+    name: str = Field(min_length=1, max_length=101)
     description: str = Field(min_length=1)
     full_amount: int = Field(..., gt=0)
     invested_amount: int = 0
     fully_invested: bool = False
-    create_date: datetime = datetime.now()
+    create_date: datetime = Field(default_factory=datetime.now)
     close_date: datetime = None
 
     @validator('name')
