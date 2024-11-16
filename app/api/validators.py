@@ -49,7 +49,7 @@ async def check_project_full_amount(
         project: CharityProject,
         obj_full_amount: int
 ) -> None:
-    if obj_full_amount <= project.invested_amount:
+    if obj_full_amount < project.invested_amount:
         raise HTTPException(
             status_code=422,
             detail='Нельзя установить требуемую сумму меньше уже внесённой!',
