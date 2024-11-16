@@ -56,7 +56,7 @@ async def partially_update_project(
         await check_name_duplicate(obj_in.name, session)
 
     if obj_in.full_amount is not None:
-        await check_project_full_amount(project, obj_in.full_amount)
+        project = await check_project_full_amount(project, obj_in.full_amount)
 
     project = await projects_crud.update(
         project, obj_in, session

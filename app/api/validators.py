@@ -37,9 +37,9 @@ async def check_project_before_delete(
         session: AsyncSession,
 ) -> CharityProject:
     project = await check_project_exists(project_id, session)
-    if project.invested_amount != 0:
+    if project.invested_amount != 0 or project.fully_invested:
         raise HTTPException(
-            status_code=422,
+            status_code=400,
             detail='В проект уже внесены средства!',
         )
     return project
@@ -48,9 +48,12 @@ async def check_project_before_delete(
 async def check_project_full_amount(
         project: CharityProject,
         obj_full_amount: int
-) -> None:
+) -> CharityProject:
     if obj_full_amount < project.invested_amount:
         raise HTTPException(
             status_code=422,
             detail='Нельзя установить требуемую сумму меньше уже внесённой!',
         )
+    elif obj_full_amount == project.invested_amount:
+        project.fully_invested = True
+    return project
