@@ -27,7 +27,7 @@ async def check_name_duplicate(
     room_id = await projects_crud.get_project_id_by_name(project_name, session)
     if room_id is not None:
         raise HTTPException(
-            status_code=422,
+            status_code=400,
             detail='Проект с таким именем уже существует!',
         )
 
