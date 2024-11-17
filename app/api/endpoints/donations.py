@@ -27,6 +27,22 @@ async def create_new_donation(
     return DonationUserSchema.from_orm(new_donation)
 
 @router.get(
+    '/my',
+    response_model=list[DonationDB],
+    response_model_exclude_none=True,
+)
+async def get_all_donation(
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_user)
+):
+    all_projects = await donation_crud.get_by_user(
+        session=session, user=user
+    )
+    all_projects = [DonationUserSchema.from_orm(donation) for donation in all_projects]
+    return all_projects
+
+
+@router.get(
     '/',
     response_model=list[DonationDB],
     response_model_exclude_none=True,
