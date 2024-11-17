@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field
 
 
 class DonationCreate(BaseModel):
-    # user_id: int
     comment: Optional[str] = None
     full_amount: int = Field(..., gt=0)
     invested_amount: int = 0

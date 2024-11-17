@@ -30,6 +30,7 @@ async def create_new_donation(
     '/my',
     response_model=list[DonationDB],
     response_model_exclude_none=True,
+    response_model_exclude_unset=True,
 )
 async def get_all_donation(
     session: AsyncSession = Depends(get_async_session),
