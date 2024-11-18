@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,7 +49,8 @@ async def check_project_before_delete(
 
 async def check_project_full_amount(
         project: CharityProject,
-        obj_full_amount: int
+        obj_full_amount: int,
+        session: AsyncSession
 ) -> CharityProject:
     if obj_full_amount < project.invested_amount:
         raise HTTPException(
@@ -56,4 +59,8 @@ async def check_project_full_amount(
         )
     elif obj_full_amount == project.invested_amount:
         project.fully_invested = True
+        project.close_date = datetime.now()
+        session.add(project)
+        await session.commit()
+        await session.refresh(project)
     return project

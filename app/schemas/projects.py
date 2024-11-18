@@ -1,14 +1,25 @@
 from typing import Optional
-
+from fastapi import HTTPException
 from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 class CharityProjectUpdate(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    full_amount: int = Field(..., gt=0)
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=1000)
+    full_amount: Optional[int] = Field(None, gt=0)
+
+    @root_validator(pre=True)
+    def check_forbidden_fields(cls, values):
+        forbidden_fields = {"invested_amount", "create_date", "close_date", "fully_invested"}
+        for field in forbidden_fields:
+            if field in values:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f'Нельзя изменять поле {field}',
+                )
+        return values
 
 
 class CharityProjectCreate(BaseModel):

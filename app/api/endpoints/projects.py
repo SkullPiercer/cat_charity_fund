@@ -45,7 +45,6 @@ async def partially_update_project(
     project = await check_project_exists(
         project_id, session
     )
-
     if project.fully_invested:
         raise HTTPException(
             status_code=400,
@@ -56,7 +55,7 @@ async def partially_update_project(
         await check_name_duplicate(obj_in.name, session)
 
     if obj_in.full_amount is not None:
-        project = await check_project_full_amount(project, obj_in.full_amount)
+        project = await check_project_full_amount(project, obj_in.full_amount, session)
 
     project = await projects_crud.update(
         project, obj_in, session
