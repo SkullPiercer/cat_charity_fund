@@ -1,3 +1,5 @@
+from cgitb import reset
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Donation, CharityProject
 from datetime import datetime
@@ -15,29 +17,39 @@ async def invest_funds(
     donations = await session.execute(
         select(Donation).where(Donation.fully_invested == False).order_by(Donation.create_date)
     )
-
     projects = projects.scalars().all()
     donations = donations.scalars().all()
-
     for donation in donations:
         for project in projects:
             if donation.fully_invested:
                 break
 
-            amount_to_invest = min(
-                project.full_amount - project.invested_amount,
-                donation.full_amount - donation.invested_amount
-            )
+            need_to_close = project.full_amount - project.invested_amount
+            founds = donation.full_amount - donation.invested_amount
 
-            project.invested_amount += amount_to_invest
-            donation.invested_amount += amount_to_invest
-
-            if project.invested_amount == project.full_amount:
+            if founds > need_to_close:
+                project.invested_amount = project.full_amount
                 project.fully_invested = True
                 project.close_date = datetime.now()
+                donation.invested_amount += need_to_close
+
+            elif founds == need_to_close:
+                project.invested_amount = project.full_amount
+                donation.invested_amount = donation.full_amount
+                donation.fully_invested = True
+                project.fully_invested = True
+                project.close_date = datetime.now()
+                donation.close_date = datetime.now()
+            else:
+                donation.fully_invested = True
+                donation.invested_amount = donation.full_amount
+                donation.close_date = datetime.now()
+                project.invested_amount += founds
 
             if donation.invested_amount == donation.full_amount:
                 donation.fully_invested = True
-                donation.close_date = datetime.now()
 
+
+    session.add_all(donations)
+    session.add_all(projects)
     await session.commit()

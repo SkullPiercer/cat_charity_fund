@@ -31,6 +31,7 @@ async def create_new_donation(
     response_model=list[DonationDB],
     response_model_exclude_none=True,
     response_model_exclude_unset=True,
+    dependencies=[Depends(invest_funds)]
 )
 async def get_all_donation(
     session: AsyncSession = Depends(get_async_session),
@@ -46,7 +47,8 @@ async def get_all_donation(
 @router.get(
     '/',
     response_model=list[DonationDB],
-    dependencies=[Depends(current_superuser)]
+    dependencies=[Depends(current_superuser), Depends(invest_funds)],
+
 )
 async def get_all_donation(
     session: AsyncSession = Depends(get_async_session),

@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class DonationCreate(BaseModel):
     comment: Optional[str] = None
     full_amount: int = Field(..., gt=0)
-    invested_amount: int = 0
+    invested_amount: Optional[int] = 0
     fully_invested: Optional[bool] = False
     create_date: datetime = Field(default_factory=datetime.now)
     close_date: datetime = None
