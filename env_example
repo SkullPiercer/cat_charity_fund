@@ -3,4 +3,8 @@ APP_DESCRIPTION=Средства из общего фонда уходят в о
 DATABASE_URL=sqlite+aiosqlite:///./fastapi.db
 SECRET=SOMETEXTFORSECRETWORD
 FIRST_SUPERUSER_EMAIL=root@admin.ru
+<<<<<<< HEAD
 FIRST_SUPERUSER_PASSWORD=root
+=======
+FIRST_SUPERUSER_PASSWORD=root
+>>>>>>> 5662d2df752abb56c8503a1fc8cd350b809a2445
