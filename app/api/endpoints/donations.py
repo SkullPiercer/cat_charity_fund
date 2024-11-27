@@ -7,7 +7,7 @@ from app.core.db import get_async_session
 from app.schemas.donation import DonationDB, DonationCreate, DonationUserSchema
 from app.crud.donation import donation_crud
 from app.core.user import current_user, current_superuser
-from app.core.utils import invest_funds
+from app.core.utils import invest_funds, donation_invest
 
 router = APIRouter()
 
@@ -16,7 +16,6 @@ router = APIRouter()
     response_model=DonationDB,
     response_model_exclude_none=True,
     response_model_exclude_unset=True,
-    dependencies=[Depends(invest_funds)]
 )
 async def create_new_donation(
     donation: DonationCreate,
@@ -24,7 +23,9 @@ async def create_new_donation(
     user: User = Depends(current_user)
 ):
     new_donation = await donation_crud.create(donation, session, user)
-    return DonationUserSchema.from_orm(new_donation)
+    schema = DonationUserSchema.from_orm(new_donation)
+    new_donation = await donation_invest(donation=new_donation, session=session)
+    return schema
 
 @router.get(
     '/my',

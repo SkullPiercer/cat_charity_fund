@@ -12,7 +12,7 @@ from app.api.validators import (
     check_project_full_amount,
     check_project_full
 )
-from app.core.utils import invest_funds
+from app.core.utils import project_invest
 from app.core.user import current_superuser
 
 router = APIRouter()
@@ -21,7 +21,7 @@ router = APIRouter()
     '/',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
-    dependencies=[Depends(current_superuser), Depends(invest_funds)]
+    dependencies=[Depends(current_superuser)]
 )
 async def create_new_project(
         project: CharityProjectCreate,
@@ -29,13 +29,14 @@ async def create_new_project(
 ):
     await check_name_duplicate(project.name, session)
     new_project = await projects_crud.create(project, session)
+    new_project = await project_invest(project=new_project, session=session)
     return new_project
 
 @router.patch(
     '/{project_id}',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
-    dependencies=[Depends(current_superuser), Depends(invest_funds)]
+    dependencies=[Depends(current_superuser)]
 )
 async def partially_update_project(
         project_id: int,
@@ -69,7 +70,6 @@ async def partially_update_project(
     '/',
     response_model=list[CharityProjectDB],
     response_model_exclude_none=True,
-    dependencies=[Depends(invest_funds)]
 )
 async def get_all_projects(
     session: AsyncSession = Depends(get_async_session)
