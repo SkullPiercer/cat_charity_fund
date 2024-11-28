@@ -6,6 +6,7 @@ from app.models import User
 from app.core.db import get_async_session
 from app.schemas.donation import DonationDB, DonationCreate, DonationUserSchema
 from app.crud.donation import donation_crud
+from app.crud.projects import projects_crud
 from app.core.user import current_user, current_superuser
 from app.core.utils import invest_funds, donation_invest
 
@@ -23,9 +24,11 @@ async def create_new_donation(
     user: User = Depends(current_user)
 ):
     new_donation = await donation_crud.create(donation, session, user)
-    schema = DonationUserSchema.from_orm(new_donation)
-    new_donation = await donation_invest(donation=new_donation, session=session)
-    return schema
+    available_projects = await projects_crud.get_not_full_invested(session)
+    donation_invest(donation=new_donation, projects=available_projects)
+    await session.commit()
+    await session.refresh(new_donation)
+    return DonationUserSchema.from_orm(new_donation)
 
 @router.get(
     '/my',

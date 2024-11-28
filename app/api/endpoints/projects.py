@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.schemas.projects import CharityProjectDB, CharityProjectCreate, CharityProjectUpdate
 from app.crud.projects import projects_crud
+from app.crud.donation import donation_crud
 from app.api.validators import (
     check_project_exists,
     check_name_duplicate,
@@ -29,7 +30,11 @@ async def create_new_project(
 ):
     await check_name_duplicate(project.name, session)
     new_project = await projects_crud.create(project, session)
-    new_project = await project_invest(project=new_project, session=session)
+    available_donations = await donation_crud.get_not_full_invested(session)
+    print(available_donations)
+    project_invest(project=new_project, donations=available_donations)
+    await session.commit()
+    await session.refresh(new_project)
     return new_project
 
 @router.patch(
