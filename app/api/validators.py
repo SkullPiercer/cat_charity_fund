@@ -48,20 +48,17 @@ async def check_project_before_delete(
 
 
 async def check_project_full_amount(
-        project: CharityProject,
-        obj_full_amount: int,
+    project: CharityProject,
+    obj_full_amount: int,
+    session: AsyncSession
 ):
+
     if obj_full_amount < project.invested_amount:
         raise HTTPException(
             status_code=400,
             detail='Нельзя установить требуемую сумму меньше уже внесённой!',
         )
 
-async def check_project_full(
-        project: CharityProject,
-        obj_full_amount: int,
-        session: AsyncSession
-):
     if obj_full_amount == project.invested_amount:
         project.fully_invested = True
         project.close_date = datetime.now()

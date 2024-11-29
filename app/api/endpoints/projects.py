@@ -11,12 +11,12 @@ from app.api.validators import (
     check_name_duplicate,
     check_project_before_delete,
     check_project_full_amount,
-    check_project_full
 )
 from app.core.utils import project_invest
 from app.core.user import current_superuser
 
 router = APIRouter()
+
 
 @router.post(
     '/',
@@ -31,11 +31,11 @@ async def create_new_project(
     await check_name_duplicate(project.name, session)
     new_project = await projects_crud.create(project, session)
     available_donations = await donation_crud.get_not_full_invested(session)
-    print(available_donations)
     project_invest(project=new_project, donations=available_donations)
     await session.commit()
     await session.refresh(new_project)
     return new_project
+
 
 @router.patch(
     '/{project_id}',
@@ -51,6 +51,7 @@ async def partially_update_project(
     project = await check_project_exists(
         project_id, session
     )
+
     if project.fully_invested:
         raise HTTPException(
             status_code=400,
@@ -60,16 +61,18 @@ async def partially_update_project(
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
 
-
     if obj_in.full_amount is not None:
-        await check_project_full_amount(project, obj_in.full_amount)
-        project = await check_project_full(project, obj_in.full_amount, session)
-
+        project = await check_project_full_amount(
+            project=project,
+            obj_full_amount=obj_in.full_amount,
+            session=session
+        )
     project = await projects_crud.update(
         project, obj_in, session
     )
 
     return project
+
 
 @router.get(
     '/',
@@ -77,10 +80,11 @@ async def partially_update_project(
     response_model_exclude_none=True,
 )
 async def get_all_projects(
-    session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session)
 ):
     all_projects = await projects_crud.get_multi(session)
     return all_projects
+
 
 @router.delete(
     '/{project_id}',
