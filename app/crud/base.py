@@ -77,6 +77,10 @@ class CRUDBase:
             session: AsyncSession
     ):
         obj_list = await session.execute(
-            select(self.model).where(self.model.fully_invested == False).order_by(self.model.create_date)
+            select(
+                self.model
+            ).where(
+                self.model.fully_invested.is_(False)
+            ).order_by(self.model.create_date)
         )
         return obj_list.scalars().all()

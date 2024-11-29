@@ -1,8 +1,8 @@
-from typing import Optional
-from fastapi import HTTPException
 from datetime import datetime
+from fastapi import HTTPException
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 
 class CharityProjectUpdate(BaseModel):
@@ -42,6 +42,7 @@ class CharityProjectCreate(BaseModel):
         if value is None:
             raise ValueError('Описание проекта не может быть пустым!')
         return value
+
 
 class CharityProjectDB(CharityProjectCreate):
     id: int

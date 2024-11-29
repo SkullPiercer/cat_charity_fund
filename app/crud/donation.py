@@ -1,11 +1,8 @@
-from typing import Optional
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
-from app.models import Donation
-from app.models import User
+from app.models import Donation, User
 
 
 class CRUDDonations(CRUDBase):
@@ -20,5 +17,6 @@ class CRUDDonations(CRUDBase):
             )
         )
         return user_donations.scalars().all()
+
 
 donation_crud = CRUDDonations(Donation)
