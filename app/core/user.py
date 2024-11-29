@@ -36,9 +36,9 @@ auth_backend = AuthenticationBackend(
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def validate_password(
-        self,
-        password: str,
-        user: Union[UserCreate, User],
+            self,
+            password: str,
+            user: Union[UserCreate, User],
     ) -> None:
         if len(password) < 3:
             raise InvalidPasswordException(
@@ -55,9 +55,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         print(f'Пользователь {user.email} зарегистрирован.')
 
 
-
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
+
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,

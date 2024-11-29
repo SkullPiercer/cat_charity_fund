@@ -3,7 +3,9 @@ from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.schemas.projects import CharityProjectDB, CharityProjectCreate, CharityProjectUpdate
+from app.schemas.projects import (
+    CharityProjectDB, CharityProjectCreate, CharityProjectUpdate
+)
 from app.crud.projects import projects_crud
 from app.crud.donation import donation_crud
 from app.api.validators import (

@@ -12,7 +12,9 @@ class CharityProjectUpdate(BaseModel):
 
     @root_validator(pre=True)
     def check_forbidden_fields(cls, values):
-        forbidden_fields = {"invested_amount", "create_date", "close_date", "fully_invested"}
+        forbidden_fields = {
+            "invested_amount", "create_date", "close_date", "fully_invested"
+        }
         for field in forbidden_fields:
             if field in values:
                 raise HTTPException(
