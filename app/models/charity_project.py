@@ -1,12 +1,13 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
 from sqlalchemy.sql import func
 
+from app.core.constants import PROJECTNAME_MAX_LEN
 from app.core.db import Base
 
 
 class CharityProject(Base):
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), unique=True, nullable=False)
+    name = Column(String(PROJECTNAME_MAX_LEN), unique=True, nullable=False)
     description = Column(Text, nullable=False)
     full_amount = Column(Integer, nullable=False)
     invested_amount = Column(Integer, default=0)

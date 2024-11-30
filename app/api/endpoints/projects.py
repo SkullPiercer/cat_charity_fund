@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +16,7 @@ from app.api.validators import (
     check_project_before_delete,
     check_project_full_amount,
 )
-from app.core.utils import project_invest
+from app.core.utils import invest
 from app.core.user import current_superuser
 
 router = APIRouter()
@@ -33,7 +35,7 @@ async def create_new_project(
     await check_name_duplicate(project.name, session)
     new_project = await projects_crud.create(project, session)
     available_donations = await donation_crud.get_not_full_invested(session)
-    project_invest(project=new_project, donations=available_donations)
+    invest(source=new_project, targets=available_donations)
     await session.commit()
     await session.refresh(new_project)
     return new_project
@@ -56,7 +58,7 @@ async def partially_update_project(
 
     if project.fully_invested:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail='Нельзя обновлять полностью проинвестированный проект!',
         )
 
@@ -69,11 +71,8 @@ async def partially_update_project(
             obj_full_amount=obj_in.full_amount,
             session=session
         )
-    project = await projects_crud.update(
-        project, obj_in, session
-    )
 
-    return project
+    return await projects_crud.update(project, obj_in, session)
 
 
 @router.get(
@@ -100,5 +99,4 @@ async def remove_project(
 ):
     """Только для суперюзеров."""
     project = await check_project_before_delete(project_id, session)
-    project = await projects_crud.remove(project, session)
-    return project
+    return await projects_crud.remove(project, session)

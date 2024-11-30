@@ -1,14 +1,32 @@
 from datetime import datetime
 from fastapi import HTTPException
+from http import HTTPStatus
 from typing import Optional
 
 from pydantic import BaseModel, Field, root_validator, validator
 
+from app.core.constants import (
+    DESCRIPTION_MAX_LEN,
+    DESCRIPTION_MIN_LEN,
+    FULL_AMOUNT_GT,
+    INVESTED_AMOUNT_DEFAULT,
+    PROJECTNAME_MAX_LEN,
+    PROJECTNAME_MIN_LEN
+)
+
 
 class CharityProjectUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str] = Field(None, min_length=1, max_length=1000)
-    full_amount: Optional[int] = Field(None, gt=0)
+    name: Optional[str] = Field(
+        None,
+        min_length=PROJECTNAME_MIN_LEN,
+        max_length=PROJECTNAME_MAX_LEN
+    )
+    description: Optional[str] = Field(
+        None,
+        min_length=DESCRIPTION_MIN_LEN,
+        max_length=DESCRIPTION_MAX_LEN
+    )
+    full_amount: Optional[int] = Field(None, gt=FULL_AMOUNT_GT)
 
     @root_validator(pre=True)
     def check_forbidden_fields(cls, values):
@@ -18,17 +36,20 @@ class CharityProjectUpdate(BaseModel):
         for field in forbidden_fields:
             if field in values:
                 raise HTTPException(
-                    status_code=422,
+                    status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
                     detail=f'Нельзя изменять поле {field}',
                 )
         return values
 
 
 class CharityProjectCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=101)
-    description: str = Field(min_length=1)
-    full_amount: int = Field(..., gt=0)
-    invested_amount: int = 0
+    name: str = Field(
+        min_length=PROJECTNAME_MIN_LEN,
+        max_length=PROJECTNAME_MAX_LEN
+    )
+    description: str = Field(min_length=DESCRIPTION_MIN_LEN)
+    full_amount: int = Field(..., gt=FULL_AMOUNT_GT)
+    invested_amount: int = INVESTED_AMOUNT_DEFAULT
     fully_invested: bool = False
     create_date: datetime = Field(default_factory=datetime.now)
     close_date: datetime = None
