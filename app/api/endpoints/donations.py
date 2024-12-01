@@ -26,9 +26,12 @@ async def create_new_donation(
 ):
     new_donation = await donation_crud.create(donation, session, user)
     available_projects = await projects_crud.get_not_full_invested(session)
-    invest(source=new_donation, targets=available_projects)
-    await session.commit()
-    await session.refresh(new_donation)
+    await invest(
+        source=new_donation,
+        targets=available_projects,
+        session=session
+    )
+
     return DonationUserSchema.from_orm(new_donation)
 
 
@@ -46,9 +49,8 @@ async def get_all_donation(
     all_projects = await donation_crud.get_by_user(
         session=session, user=user
     )
-    all_projects = [DonationUserSchema.from_orm(donation) for donation in
-                    all_projects]
-    return all_projects
+
+    return [DonationUserSchema.from_orm(donation) for donation in all_projects]
 
 
 @router.get(

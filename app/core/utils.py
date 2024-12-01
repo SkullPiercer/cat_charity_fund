@@ -1,9 +1,15 @@
 from datetime import datetime
+from typing import Union
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import CharityProject, Donation
 
 
-def invest(
-        source,
-        targets,
+async def invest(
+        source: Union[CharityProject, Donation],
+        targets: Union[list[CharityProject], list[Donation]],
+        session: AsyncSession
 ):
     for target in targets:
         if source.fully_invested:
@@ -29,5 +35,8 @@ def invest(
             source.invested_amount = source.full_amount
             source.close_date = datetime.now()
             target.invested_amount += source_remaining
+
+    await session.commit()
+    await session.refresh(source)
 
     return source
